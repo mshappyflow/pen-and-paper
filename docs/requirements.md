@@ -39,7 +39,7 @@ Build a single game implementation with local play.
 ## Success Criteria
 
 ### Short-term
-- Two players can play a complete game of 67
+- Two players can play a complete game of No 67
 - Game enforces rules correctly
 - Clear visual feedback for game state
 - Intuitive user interface in Dutch

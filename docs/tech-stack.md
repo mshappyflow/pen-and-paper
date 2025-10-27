@@ -40,6 +40,24 @@
 - Frontend: Vercel, Netlify, or similar
 - Backend: TBD (consider Railway, Fly.io, or traditional VPS)
 
+## Project Structure
+
+```
+pen-and-paper/
+├── client/              # Frontend React application
+│   ├── src/            # Source code
+│   ├── public/         # Static assets
+│   ├── package.json    # Frontend dependencies
+│   └── vite.config.ts  # Vite configuration
+├── docs/               # Project documentation
+├── claude.md           # Development guidelines
+└── README.md           # Project overview
+```
+
+Future structure will include:
+- `server/` - Backend Bun application for multiplayer
+- `shared/` - Shared types and logic between client/server
+
 ## Architecture Decisions
 
 ### Why Web-based?
