@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GameBoard } from './GameBoard';
-import type { Player, Position } from '../types/game';
-import { PLAYER_ONE } from '../types/game';
+import { PlayerAvatar } from './PlayerAvatar';
+import { WinAnimation } from './WinAnimation';
+import type { Player, Position, MoveHistory } from '../types/game';
+import { PLAYER_ONE, PLAYER_TWO } from '../types/game';
 import {
   createEmptyBoard,
   isValidMove,
@@ -13,11 +15,23 @@ import {
 export function Game() {
   const [board, setBoard] = useState(createEmptyBoard());
   const [currentPlayer, setCurrentPlayer] = useState<Player>(PLAYER_ONE);
-  const [selectedSquares, setSelectedSquares] = useState<Position[]>([]);
+  const [selectedSquares, setSelectedSquares] = useState<Position[]>([{ row: 0, col: 0 }]); // Start with top-left selected for P1
   const [moveCount, setMoveCount] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [winner, setWinner] = useState<Player | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [history, setHistory] = useState<MoveHistory[]>([]);
+  const [gamePhase, setGamePhase] = useState<'playing' | 'phase2' | 'phase3'>('playing');
+
+  // Timer effect for game phases
+  useEffect(() => {
+    if (isGameOver && gamePhase === 'phase2') {
+      const timer = setTimeout(() => {
+        setGamePhase('phase3');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isGameOver, gamePhase]);
 
   const handleSquareClick = (pos: Position) => {
     if (isGameOver) return;
@@ -54,17 +68,36 @@ export function Game() {
 
     // Apply the move
     const newBoard = applyMove(board, selectedSquares, currentPlayer);
+    const newMoveCount = moveCount + 1;
+
+    // Add to history
+    const newMove: MoveHistory = {
+      player: currentPlayer,
+      positions: [...selectedSquares],
+      moveNumber: newMoveCount,
+    };
+
     setBoard(newBoard);
-    setSelectedSquares([]);
+    setHistory([...history, newMove]);
     setErrorMessage(null);
-    setMoveCount(moveCount + 1);
+    setMoveCount(newMoveCount);
 
     // Check if next player has valid moves
     if (!hasValidMoves(newBoard)) {
       setIsGameOver(true);
       setWinner(currentPlayer); // Current player wins because opponent can't move
+      setSelectedSquares([]);
+      setGamePhase('phase2'); // Start phase 2 (intermediate message)
     } else {
-      setCurrentPlayer(getOtherPlayer(currentPlayer));
+      const nextPlayer = getOtherPlayer(currentPlayer);
+      setCurrentPlayer(nextPlayer);
+
+      // Pre-select required square for second move (Player 2's first move)
+      if (newMoveCount === 1) {
+        setSelectedSquares([{ row: 5, col: 6 }]); // Bottom-right for Player 2
+      } else {
+        setSelectedSquares([]);
+      }
     }
   };
 
@@ -73,25 +106,73 @@ export function Game() {
     setErrorMessage(null);
   };
 
+  const handleUndo = () => {
+    if (history.length === 0) return;
+
+    // Remove last move from history
+    const newHistory = history.slice(0, -1);
+    const lastMove = history[history.length - 1];
+
+    // Rebuild board from history
+    const newBoard = createEmptyBoard();
+    newHistory.forEach((move) => {
+      move.positions.forEach((pos) => {
+        newBoard[pos.row][pos.col] = move.player;
+      });
+    });
+
+    setHistory(newHistory);
+    setBoard(newBoard);
+    setMoveCount(newHistory.length);
+    setCurrentPlayer(lastMove.player); // Go back to player who made the last move
+    setIsGameOver(false);
+    setWinner(null);
+    setSelectedSquares([]);
+    setErrorMessage(null);
+    setGamePhase('playing');
+  };
+
   const handleResetGame = () => {
     setBoard(createEmptyBoard());
     setCurrentPlayer(PLAYER_ONE);
-    setSelectedSquares([]);
+    setSelectedSquares([{ row: 0, col: 0 }]); // Start with top-left selected for P1
     setMoveCount(0);
     setIsGameOver(false);
     setWinner(null);
     setErrorMessage(null);
+    setHistory([]);
+    setGamePhase('playing');
+  };
+
+  const handleGiveUp = () => {
+    setIsGameOver(true);
+    setWinner(getOtherPlayer(currentPlayer)); // Other player wins
+    setGamePhase('phase2'); // Start phase 2 (intermediate message)
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full">
+      <div className="max-w-7xl w-full">
         <h1 className="text-5xl font-bold text-white text-center mb-8">No 67</h1>
 
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex gap-8 items-center justify-center">
+          {/* Player 1 Avatar */}
+          <PlayerAvatar
+            player={PLAYER_ONE}
+            isActive={!isGameOver && currentPlayer === PLAYER_ONE}
+            isWinner={gamePhase !== 'playing' && winner === PLAYER_ONE}
+            isLoser={gamePhase !== 'playing' && winner === PLAYER_TWO}
+          />
+
+          {/* Main Game Area */}
+          <div className="flex flex-col items-center gap-6">
           {/* Game Status */}
           <div className="bg-white rounded-lg p-6 shadow-lg min-w-96 text-center">
-            {isGameOver ? (
+            {gamePhase === 'phase2' ? (
+              <div>
+                <h2 className="text-2xl font-bold text-red-600 mb-2">6×7 gevuld, je kan niets meer doen</h2>
+              </div>
+            ) : gamePhase === 'phase3' ? (
               <div>
                 <h2 className="text-2xl font-bold text-green-600 mb-2">Spel afgelopen!</h2>
                 <p className="text-xl">
@@ -106,6 +187,9 @@ export function Game() {
                 <p className="text-gray-600">
                   Selecteer {selectedSquares.length > 0 ? `${selectedSquares.length}/` : ''}1-6 verbonden vakjes
                 </p>
+                <p className="text-gray-500 text-sm mt-2">
+                  Vermijd dat alle 6 bij 7 vakjes ingekleurd zijn, als je aan de beurt bent.
+                </p>
               </div>
             )}
           </div>
@@ -114,6 +198,7 @@ export function Game() {
           <GameBoard
             board={board}
             selectedSquares={selectedSquares}
+            history={history}
             onSquareClick={handleSquareClick}
           />
 
@@ -142,8 +227,21 @@ export function Game() {
                 >
                   Wis selectie
                 </button>
+                <button
+                  onClick={handleGiveUp}
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                >
+                  Geef op
+                </button>
               </>
             )}
+            <button
+              onClick={handleUndo}
+              disabled={history.length === 0}
+              className="bg-yellow-500 hover:bg-yellow-600 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            >
+              Ongedaan maken
+            </button>
             <button
               onClick={handleResetGame}
               className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
@@ -152,6 +250,18 @@ export function Game() {
             </button>
           </div>
         </div>
+
+          {/* Player 2 Avatar */}
+          <PlayerAvatar
+            player={PLAYER_TWO}
+            isActive={!isGameOver && currentPlayer === PLAYER_TWO}
+            isWinner={gamePhase !== 'playing' && winner === PLAYER_TWO}
+            isLoser={gamePhase !== 'playing' && winner === PLAYER_ONE}
+          />
+        </div>
+
+        {/* Win Animation */}
+        {gamePhase === 'phase3' && winner && <WinAnimation winner={winner} />}
       </div>
     </div>
   );

@@ -108,18 +108,18 @@ export function isValidMove(
 
   // Check first move special rules
   if (moveCount === 0) {
-    // Player 1: must include bottom-right corner
+    // Player 1: must include top-left corner
+    const hasTopLeft = positions.some((p) => p.row === 0 && p.col === 0);
+    if (!hasTopLeft) {
+      return { valid: false, reason: 'Eerste zet moet linksboven bevatten' };
+    }
+  } else if (moveCount === 1) {
+    // Player 2: must include bottom-right corner
     const hasBottomRight = positions.some(
       (p) => p.row === GRID_ROWS - 1 && p.col === GRID_COLS - 1
     );
     if (!hasBottomRight) {
       return { valid: false, reason: 'Eerste zet moet rechtsonder bevatten' };
-    }
-  } else if (moveCount === 1) {
-    // Player 2: must include top-left corner
-    const hasTopLeft = positions.some((p) => p.row === 0 && p.col === 0);
-    if (!hasTopLeft) {
-      return { valid: false, reason: 'Eerste zet moet linksboven bevatten' };
     }
   }
 

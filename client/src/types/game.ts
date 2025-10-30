@@ -25,6 +25,13 @@ export type SquareState = Player | null;
 // Game board - 2D array of square states
 export type Board = SquareState[][];
 
+// Move history entry
+export type MoveHistory = {
+  player: Player;
+  positions: Position[];
+  moveNumber: number;
+};
+
 // Game state
 export type GameState = {
   board: Board;
@@ -32,4 +39,5 @@ export type GameState = {
   isGameOver: boolean;
   winner: Player | null;
   moveCount: number;
+  history: MoveHistory[];
 };
