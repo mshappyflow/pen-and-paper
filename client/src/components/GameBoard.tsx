@@ -20,12 +20,10 @@ export function GameBoard({ board, selectedSquares, onSquareClick }: GameBoardPr
     }
 
     if (square === PLAYER_ONE) {
-      console.log(`Square [${row},${col}] is PLAYER_ONE (${square})`);
       return 'bg-blue-400 border-blue-600';
     }
 
     if (square === PLAYER_TWO) {
-      console.log(`Square [${row},${col}] is PLAYER_TWO (${square})`);
       return 'bg-red-400 border-red-600';
     }
 
