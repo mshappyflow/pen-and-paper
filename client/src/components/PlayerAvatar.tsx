@@ -28,13 +28,13 @@ export function PlayerAvatar({ player, isActive, isWinner, isLoser }: PlayerAvat
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4" style={{ width: '176px' }}>
       <div
         className={`
           w-44 h-44 rounded-full flex items-center justify-center
           border-4 ${borderColor} ${playerColor}
-          transition-all duration-300
-          ${isActive ? 'animate-pulse scale-110 shadow-2xl' : 'opacity-70'}
+          transition-opacity duration-300
+          ${isActive ? 'animate-pulse shadow-2xl' : 'opacity-70'}
         `}
       >
         {getEmoji()}

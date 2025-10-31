@@ -155,7 +155,8 @@ export function Game() {
       <div className="max-w-7xl w-full">
         <h1 className="text-5xl font-bold text-white text-center mb-8">No 67</h1>
 
-        <div className="flex gap-8 items-center justify-center">
+        <div className="flex items-center justify-center" style={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ width: '176px', marginRight: '80px' }}>
           {/* Player 1 Avatar */}
           <PlayerAvatar
             player={PLAYER_ONE}
@@ -163,17 +164,18 @@ export function Game() {
             isWinner={gamePhase !== 'playing' && winner === PLAYER_ONE}
             isLoser={gamePhase !== 'playing' && winner === PLAYER_TWO}
           />
+          </div>
 
           {/* Main Game Area */}
-          <div className="flex flex-col items-center gap-6">
+          <div className="flex flex-col items-center gap-6" style={{ minWidth: '800px' }}>
           {/* Game Status */}
-          <div className="bg-white rounded-lg p-6 shadow-lg min-w-96 text-center">
+          <div className="bg-white rounded-lg p-6 shadow-lg min-w-96 text-center" style={{ minHeight: '156px' }}>
             {gamePhase === 'phase2' ? (
-              <div>
+              <div className="flex flex-col justify-center" style={{ minHeight: '108px' }}>
                 <h2 className="text-2xl font-bold text-red-600 mb-2">6×7 gevuld, je kan niets meer doen</h2>
               </div>
             ) : gamePhase === 'phase3' ? (
-              <div>
+              <div className="flex flex-col justify-center" style={{ minHeight: '108px' }}>
                 <h2 className="text-2xl font-bold text-green-600 mb-2">Spel afgelopen!</h2>
                 <p className="text-xl">
                   Speler {winner} wint! 🎉
@@ -210,7 +212,7 @@ export function Game() {
           )}
 
           {/* Controls */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-center">
             {!isGameOver && (
               <>
                 <button
@@ -249,8 +251,9 @@ export function Game() {
               Nieuw spel
             </button>
           </div>
-        </div>
+          </div>
 
+          <div style={{ width: '176px', marginLeft: '80px' }}>
           {/* Player 2 Avatar */}
           <PlayerAvatar
             player={PLAYER_TWO}
@@ -258,6 +261,7 @@ export function Game() {
             isWinner={gamePhase !== 'playing' && winner === PLAYER_TWO}
             isLoser={gamePhase !== 'playing' && winner === PLAYER_ONE}
           />
+          </div>
         </div>
 
         {/* Win Animation */}
