@@ -30,24 +30,24 @@ export function WinAnimation({ winner }: WinAnimationProps) {
           animation: fromLeft
             ? 'slideRight 2.4s ease-in-out forwards'
             : 'slideLeft 2.4s ease-in-out forwards',
-          transform: 'translateY(40px)' // Position it lower to align with player avatars
+          transform: 'translateY(20px)' // Align with player avatars at center
         }}
       />
       <style>{`
         @keyframes slideRight {
           from {
-            transform: translateX(-400px) translateY(40px);
+            transform: translateX(-400px) translateY(20px);
           }
           to {
-            transform: translateX(400px) translateY(40px);
+            transform: translateX(400px) translateY(20px);
           }
         }
         @keyframes slideLeft {
           from {
-            transform: translateX(400px) translateY(40px);
+            transform: translateX(400px) translateY(20px);
           }
           to {
-            transform: translateX(-400px) translateY(40px);
+            transform: translateX(-400px) translateY(20px);
           }
         }
       `}</style>
