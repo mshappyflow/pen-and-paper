@@ -23,6 +23,9 @@ export function Game() {
   const [history, setHistory] = useState<MoveHistory[]>([]);
   const [gamePhase, setGamePhase] = useState<'playing' | 'phase2' | 'phase3'>('playing');
 
+  // Check for compact mode via URL parameter
+  const isCompactMode = new URLSearchParams(window.location.search).get('compact') === 'true';
+
   // Timer effect for game phases
   useEffect(() => {
     if (isGameOver && gamePhase === 'phase2') {
@@ -155,8 +158,8 @@ export function Game() {
       <div className="max-w-7xl w-full">
         <h1 className="text-5xl font-bold text-white text-center mb-8">No 67</h1>
 
-        <div className="flex items-center justify-center" style={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ width: '176px', marginRight: '80px' }}>
+        <div className="flex items-center justify-center" style={{ width: '100%', maxWidth: isCompactMode ? '100%' : '1400px', margin: '0 auto' }}>
+          <div style={{ width: '176px', marginRight: isCompactMode ? '40px' : '80px' }}>
           {/* Player 1 Avatar */}
           <PlayerAvatar
             player={PLAYER_ONE}
@@ -167,7 +170,7 @@ export function Game() {
           </div>
 
           {/* Main Game Area */}
-          <div className="flex flex-col items-center gap-6" style={{ minWidth: '800px' }}>
+          <div className="flex flex-col items-center gap-6" style={{ minWidth: isCompactMode ? 'auto' : '800px' }}>
           {/* Game Status */}
           <div className="bg-white rounded-lg p-6 shadow-lg min-w-96 text-center" style={{ minHeight: '156px' }}>
             {gamePhase === 'phase2' ? (
@@ -253,7 +256,7 @@ export function Game() {
           </div>
           </div>
 
-          <div style={{ width: '176px', marginLeft: '80px' }}>
+          <div style={{ width: '176px', marginLeft: isCompactMode ? '40px' : '80px' }}>
           {/* Player 2 Avatar */}
           <PlayerAvatar
             player={PLAYER_TWO}
